@@ -15,4 +15,11 @@ Imports:
     cli,
     fs,
     glue,
-    httr2
+    httr2,
+    readr,
+    dplyr,
+    lubridate,
+    stringr,
+    rlang
+Depends: 
+    R (>= 2.10)
