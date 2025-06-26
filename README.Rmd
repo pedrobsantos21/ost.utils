@@ -1,0 +1,55 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```r
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# ost.utils
+
+<!-- badges: start -->
+<!-- badges: end -->
+
+The `ost.utils` package provides utility methods and tools to ease the workflow in projects developed by Coordenadoria do Observatório de Segurança no Trânsito (COST) of Detran-SP.
+
+## Installation
+
+You can install the development version of `ost.utils` from GitHub with:
+
+```r
+# install.packages("pak")
+pak::pak("pedrobsantos21/ost.utils")
+```
+
+## Example
+
+This is a basic example which shows you how to download and clean Infosiga.SP data:
+
+```{r}
+library(ost.utils)
+
+temp <- tempdir()
+download_infosiga(temp)
+df_sinistros <- load_infosiga(file_type = "sinistros", path = temp)
+df_sinistros_clean <- clean_infosiga(df_sinistros, "sinistros")
+
+head(df_sinistros_clean)
+```
+
+## License
+
+This package is licensed under the GPL (>= 3) license.
+
+## Citation
+
+```{r citation}
+citation("infosiga")
+```

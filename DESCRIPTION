@@ -1,10 +1,17 @@
 Package: ost.utils
-Title: What the Package Does (One Line, Title Case)
+Title: Provides Utility Methods and Tools for COST
 Version: 0.0.0.9000
 Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"),
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
+    person(
+        given = c("Pedro", "Augusto", "Borges"),
+        family = "Santos",
+        email = "pedro.santos@detran.sp.gov.br",
+        role = c("aut", "cre"),
+        comment = c(ORCID = "0000-0003-0550-4251")
+    )
+Description: This package contains utility tools and methods to ease the 
+    workflow in R projects developed by Coordenadoria do Observatório de
+    Segurança no Trânsito (COST) of Detran-SP
 License: GPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
