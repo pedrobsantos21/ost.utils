@@ -17,7 +17,7 @@ Encoding: UTF-8
 Date: 2025-06-26
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
-URL: https://github.com/pedrobsantos21/ost.utils
+URL: https://github.com/pedrobsantos21/ost.utils, https://pedrobsantos21.github.io/ost.utils/
 BugReports: https://github.com/pedrobsantos21/ost.utils/issues
 Imports: 
     cli,
