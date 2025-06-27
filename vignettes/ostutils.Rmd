@@ -1,0 +1,83 @@
+---
+title: "Getting Started"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{ostutils}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+The `ost.utils` package provides tools and methods to streamline the workflow in R projects developed by the Coordenadoria do Observatório de Segurança no Trânsito (COST) of Detran-SP.
+
+## Installation
+
+The development version of `ost.utils` can be installed from [GitHub](https://github.com/pedrobsantos21/ost.utils) with:
+
+```r
+# install.packages("pak")
+pak::pak("pedrobsantos21/ost.utils")
+```
+
+## Package organization
+
+This package is organized into two main groups of functions:
+
+1. `infosiga`: methods to download, load and clean open data from [Infosiga.SP](https://infosiga.detran.sp.gov.br)
+
+- `download_infosiga()`
+
+- `load_infosiga()`
+
+- `clean_infosiga()`
+
+2. `plot`: helper functions to plot data with `ggplot2`:
+
+- `palette_detran()`
+
+- `theme_detran()`
+
+## Usage example
+
+In this example, we will load Infosiga road crash data and plot it using `ggplot2`. First, we load the required packages:
+
+```{r setup}
+library(ost.utils)
+library(ggplot2)
+library(dplyr)
+library(lubridate)
+```
+
+Then, we use `download_infosiga()` to save the data to a temporary folder, load the road crash data with `load_infosiga()`, and clean it with `clean_infosiga()`. In a typical project, you might download the data to a dedicated `data/` folder.
+
+```{r}
+temp <- tempdir()
+download_infosiga(temp)
+
+df <- load_infosiga(file_type = "sinistros", path = temp)
+
+df_clean <- clean_infosiga(df, file_type = "sinistros")
+
+head(df_clean)
+```
+
+Now we can plot the count of road crashes per year using the custom Detran style:
+
+```{r}
+df_clean |> 
+  filter(
+    tipo_registro %in% c("Sinistro fatal", "Sinistro não fatal"),
+    year(data_sinistro) > 2018
+  ) |> 
+  count(year = year(data_sinistro)) |> 
+  ggplot(aes(x = year, y=n)) +
+  geom_col(fill = palette_detran()$blue) +
+  theme_detran()
+
+```

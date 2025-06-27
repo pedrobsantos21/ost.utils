@@ -16,13 +16,14 @@ knitr::opts_chunk$set(
 # ost.utils
 
 <!-- badges: start -->
+[![R-CMD-check](https://github.com/pedrobsantos21/ost.utils/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/pedrobsantos21/ost.utils/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 The `ost.utils` package provides utility methods and tools to ease the workflow in projects developed by Coordenadoria do Observatório de Segurança no Trânsito (COST) of Detran-SP.
 
 ## Installation
 
-You can install the development version of `ost.utils` from GitHub with:
+You can install the `ost.utils` from GitHub with:
 
 ```r
 # install.packages("pak")

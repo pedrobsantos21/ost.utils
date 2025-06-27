@@ -4,6 +4,8 @@
 # ost.utils
 
 <!-- badges: start -->
+
+[![R-CMD-check](https://github.com/pedrobsantos21/ost.utils/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/pedrobsantos21/ost.utils/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 The `ost.utils` package provides utility methods and tools to ease the
@@ -12,7 +14,7 @@ Segurança no Trânsito (COST) of Detran-SP.
 
 ## Installation
 
-You can install the development version of `ost.utils` from GitHub with:
+You can install the `ost.utils` from GitHub with:
 
 ``` r
 # install.packages("pak")
@@ -32,7 +34,7 @@ download_infosiga(temp)
 #> ℹ Starting download...
 #> ✔ Download completed.
 #> ℹ Extrating zip...
-#> ✔ Data extracted successfully at '/tmp/Rtmpc0alaa'
+#> ✔ Data extracted successfully at '/tmp/RtmpqOX4rj'
 df_sinistros <- load_infosiga(file_type = "sinistros", path = temp)
 #> ℹ Using "','" as decimal and "'.'" as grouping mark. Use `read_delim()` for more control.
 #> Rows: 1208097 Columns: 43

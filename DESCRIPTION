@@ -11,7 +11,7 @@ Authors@R:
     )
 Description: This package contains utility tools and methods to ease the 
     workflow in R projects developed by Coordenadoria do Observatório de
-    Segurança no Trânsito (COST) of Detran-SP
+    Segurança no Trânsito of Detran-SP.
 License: GPL (>= 3)
 Encoding: UTF-8
 Date: 2025-06-26
@@ -32,3 +32,7 @@ Imports:
     ggplot2
 Depends: 
     R (>= 2.10)
+Suggests: 
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr
