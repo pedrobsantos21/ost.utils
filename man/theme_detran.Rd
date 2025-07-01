@@ -4,9 +4,13 @@
 \alias{theme_detran}
 \title{Custom ggplot2 Theme for Detran Visualizations}
 \usage{
-theme_detran(...)
+theme_detran(size = 11, family = "", ...)
 }
 \arguments{
+\item{size}{base font size, given in pts.}
+
+\item{family}{base font family.}
+
 \item{...}{Additional arguments passed to \code{ggplot2::theme()}.}
 }
 \value{

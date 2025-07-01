@@ -5,13 +5,15 @@
 #' positioning, and other aesthetic modifications suitable for Detran-related
 #' data visualizations.
 #'
+#' @param size base font size, given in pts.
+#' @param family base font family.
 #' @param ... Additional arguments passed to `ggplot2::theme()`.
 #'
 #' @return A `ggplot2` theme object.
 #' @export
 #' @importFrom ggplot2 theme_minimal theme
-theme_detran <- function(...) {
-    ggplot2::theme_minimal(base_size = 11) +
+theme_detran <- function(size = 11, family = "", ...) {
+    ggplot2::theme_minimal(base_size = size, base_family = family) +
         ggplot2::theme(
             legend.position = "top",
             legend.justification = "left",
