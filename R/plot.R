@@ -13,12 +13,17 @@
 #' @export
 #' @importFrom ggplot2 theme_minimal theme
 theme_detran <- function(size = 11, family = "", ...) {
-    ggplot2::theme_minimal(base_size = size, base_family = family) +
+    ggplot2::theme_classic(base_size = size, base_family = family) +
         ggplot2::theme(
             legend.position = "top",
             legend.justification = "left",
             legend.key.size = ggplot2::unit(0.5, "cm"),
             legend.direction = "horizontal",
+            axis.ticks = ggplot2::element_blank(),
+            axis.line = ggplot2::element_line(
+                color = "grey20",
+                linewidth = 0.1
+            ),
             ...
         )
 }
