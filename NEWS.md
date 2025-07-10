@@ -1,3 +1,5 @@
+# ost.utils 0.1.2
+
 # ost.utils 0.1.1
 
 * Add two parameters to `theme_detran()`: `size` and `family`
