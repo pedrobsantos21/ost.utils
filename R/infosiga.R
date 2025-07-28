@@ -123,6 +123,10 @@ load_infosiga <- function(
     file_type = c("sinistros", "pessoas", "veiculos"),
     path
 ) {
+    if (fs::dir_exists(glue::glue("{path}/dados_infosiga"))) {
+        path <- fs::path(path, "dados_infosiga")
+    }
+
     files <- list.files(
         path,
         pattern = glue::glue("^{file_type}"),
