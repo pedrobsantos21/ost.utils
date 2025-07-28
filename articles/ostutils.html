@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ost.utils</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -59,7 +59,7 @@
       <h1>Getting Started</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/pedrobsantos21/ost.utils/blob/v0.1.2/vignettes/ostutils.Rmd" class="external-link"><code>vignettes/ostutils.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/pedrobsantos21/ost.utils/blob/main/vignettes/ostutils.Rmd" class="external-link"><code>vignettes/ostutils.Rmd</code></a></small>
       <div class="d-none name"><code>ostutils.Rmd</code></div>
     </div>
 
@@ -137,16 +137,16 @@ the data to a dedicated <code>data/</code> folder.</p>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Starting download...</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Download completed.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Extrating zip...</span></span>
-<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Data extracted successfully at '/tmp/RtmpUhJglf'</span></span>
+<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Data extracted successfully at '/tmp/Rtmpuc1eul'</span></span>
 <span></span>
 <span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load_infosiga.html">load_infosiga</a></span><span class="op">(</span>file_type <span class="op">=</span> <span class="st">"sinistros"</span>, path <span class="op">=</span> <span class="va">temp</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Using <span style="color: #0000BB;">"','"</span> as decimal and <span style="color: #0000BB;">"'.'"</span> as grouping mark. Use `read_delim()` for more control.</span></span>
-<span><span class="co">#&gt; <span style="font-weight: bold;">Rows: </span><span style="color: #0000BB;">1208097</span> <span style="font-weight: bold;">Columns: </span><span style="color: #0000BB;">43</span></span></span>
+<span><span class="co">#&gt; <span style="font-weight: bold;">Rows: </span><span style="color: #0000BB;">1224197</span> <span style="font-weight: bold;">Columns: </span><span style="color: #0000BB;">43</span></span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">Column specification</span> <span style="color: #00BBBB;">────────────────────────────────────────────────────────</span></span></span>
 <span><span class="co">#&gt; <span style="font-weight: bold;">Delimiter:</span> ";"</span></span>
-<span><span class="co">#&gt; <span style="color: #BB0000;">chr</span>  (26): tipo_registro, data_sinistro, mes_sinistro, dia_sinistro, ano_mes...</span></span>
+<span><span class="co">#&gt; <span style="color: #BB0000;">chr</span>  (25): tipo_registro, data_sinistro, mes_sinistro, dia_sinistro, ano_mes...</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">dbl</span>  (15): id_sinistro, ano_sinistro, latitude, longitude, tp_veiculo_bicicl...</span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00;">lgl</span>   (1): gravidade_ileso</span></span>
+<span><span class="co">#&gt; <span style="color: #BBBB00;">lgl</span>   (2): gravidade_ileso, tp_sinistro_colisao_traseira</span></span>
 <span><span class="co">#&gt; <span style="color: #0000BB;">time</span>  (1): hora_sinistro</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Use `spec()` to retrieve the full column specification for this data.</span></span>
