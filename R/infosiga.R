@@ -381,7 +381,9 @@ clean_infosiga <- function(
         df <- df_infosiga |>
             dplyr::select(
                 .data$id_sinistro,
-                ano_fabricacao = .data$ano_fab,
+                .data$id_veiculo,
+                .data$marca_modelo,
+                .data$ano_fab,
                 .data$ano_modelo,
                 .data$cor_veiculo,
                 .data$tipo_veiculo
@@ -396,7 +398,14 @@ clean_infosiga <- function(
                     "OUTROS" ~ "Outros",
                     "BICICLETA" ~ "Bicicleta",
                     "NAO DISPONIVEL" ~ NA
-                )
+                ),
+                cor_veiculo = dplyr::if_else(
+                    .data$cor_veiculo %in%
+                        c("Não Informado", "SEM IDENTIFICACAO"),
+                    NA,
+                    .data$cor_veiculo
+                ),
+                cor_veiculo = stringr::str_to_sentence(.data$cor_veiculo)
             )
     }
     return(df)
