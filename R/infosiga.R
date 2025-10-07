@@ -238,6 +238,9 @@ clean_infosiga <- function(
                     NA,
                     .data$tipo_local
                 ),
+                regiao_administrativa = stringr::str_to_sentence(
+                    .data$regiao_administrativa
+                ),
                 dplyr::across(
                     .data$tp_sinistro_atropelamento:.data$tp_sinistro_nao_disponivel,
                     ~ dplyr::case_when(
@@ -266,7 +269,7 @@ clean_infosiga <- function(
                 ),
                 data_obito = lubridate::dmy(.data$data_obito),
                 tipo_de_vitima = dplyr::case_match(
-                    .data[["tipo_de v\u00edtima"]],
+                    .data$tipo_de_vitima,
                     "CONDUTOR" ~ "Condutor",
                     "PASSAGEIRO" ~ "Passageiro",
                     "PEDESTRE" ~ "Pedestre",
@@ -274,7 +277,6 @@ clean_infosiga <- function(
                 ),
                 tipo_veiculo_vitima = dplyr::case_match(
                     .data$tipo_veiculo_vitima,
-                    c("PEDESTRE", "Pedestre") ~ "A p\u00e9",
                     "MOTOCICLETA" ~ "Motocicleta",
                     "AUTOMOVEL" ~ "Autom\u00f3vel",
                     "NAO DISPONIVEL" ~ NA,
@@ -284,17 +286,17 @@ clean_infosiga <- function(
                     "ONIBUS" ~ "\u00d4nibus",
                     .default = .data$tipo_veiculo_vitima
                 ),
-                tipo_modo_vitima = dplyr::case_match(
-                    .data$tipo_veiculo_vitima,
-                    "A p\u00e9" ~ "Pedestre",
-                    "Motocicleta" ~ "Ocupante de motocicleta",
-                    "Autom\u00f3vel" ~ "Ocupante de autom\u00f3vel",
-                    "Bicicleta" ~ "Ciclista",
-                    "Caminh\u00e3o" ~ "Ocupante de caminh\u00e3o",
-                    "\u00d4nibus" ~ "Ocupante de \u00f4nibus",
-                    'Outros' ~ "Outros",
-                    .default = NA
-                ),
+                # tipo_modo_vitima = dplyr::case_match(
+                #     .data$tipo_veiculo_vitima,
+                #     "A p\u00e9" ~ "Pedestre",
+                #     "Motocicleta" ~ "Ocupante de motocicleta",
+                #     "Autom\u00f3vel" ~ "Ocupante de autom\u00f3vel",
+                #     "Bicicleta" ~ "Ciclista",
+                #     "Caminh\u00e3o" ~ "Ocupante de caminh\u00e3o",
+                #     "\u00d4nibus" ~ "Ocupante de \u00f4nibus",
+                #     'Outros' ~ "Outros",
+                #     .default = NA
+                # ),
                 gravidade_lesao = dplyr::case_match(
                     .data$gravidade_lesao,
                     "FATAL" ~ "Fatal",
@@ -357,23 +359,21 @@ clean_infosiga <- function(
                         "80+"
                     )
                 ),
-                data_sinistro = lubridate::dmy(.data$data_sinistro)
-            ) |>
-            dplyr::rename(
-                tipo_vitima = .data$`tipo_de_vitima`
+                data_sinistro = lubridate::dmy(.data$data_sinistro),
+                local_obito = dplyr::case_match(
+                    .data$local_obito,
+                    "PUBLICO" ~ "Público",
+                    "NAO DISPONIVEL" ~ NA,
+                    "PRIVADO" ~ "Privado"
+                )
             ) |>
             dplyr::select(
                 .data$id_sinistro,
-                .data$data_sinistro,
-                .data$data_obito,
-                .data$sexo,
-                .data$idade,
-                .data$tipo_vitima,
-                .data$faixa_etaria_demografica,
-                .data$faixa_etaria_legal,
-                .data$tipo_veiculo_vitima,
-                .data$tipo_modo_vitima,
-                .data$gravidade_lesao
+                .data$id_veiculo,
+                .data$tipo_veiculo_vitima:.data$nacionalidade,
+                .data$data_obito:.data$dia_obito,
+                .data$local_obito,
+                .data$tempo_sinistro_obito
             )
     }
 
