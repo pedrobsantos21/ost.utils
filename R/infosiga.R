@@ -200,86 +200,59 @@ clean_infosiga <- function(
                     "NOTIFICACAO" ~ "Notifica\u00e7\u00e3o",
                 ),
                 data_sinistro = lubridate::dmy(.data$data_sinistro),
+                turno = stringr::str_to_sentence(.data$turno),
                 numero_logradouro = as.numeric(.data$numero_logradouro),
-                tipo_via = dplyr::case_match(
-                    .data$tipo_via,
-                    "NAO DISPONIVEL" ~ NA,
-                    c(
-                        "RODOVIAS",
-                        "RURAL",
-                        "RURAL (COM CARACTER\u00cdSTICA DE URBANA)"
-                    ) ~
-                        "Estradas e rodovias",
-                    c("URBANA", "VIAS MUNICIPAIS") ~ "Vias urbanas"
+                tipo_via = stringr::str_to_sentence(.data$tipo_via),
+                tipo_via = if_else(
+                    .data$tipo_via == "Nao disponivel",
+                    NA,
+                    .data$tipo_via
                 ),
                 dplyr::across(
-                    dplyr::starts_with("tp_veiculo"),
+                    .data$qtd_pedestre:.data$qtd_gravidade_nao_disponivel,
                     ~ dplyr::if_else(is.na(.x), 0, .x)
                 ),
-                dplyr::across(
-                    dplyr::starts_with("gravidade"),
-                    ~ dplyr::if_else(is.na(.x), 0, .x)
-                ),
-                administracao_via = dplyr::case_match(
+                administracao = dplyr::case_match(
                     .data$administracao,
-                    c(
-                        "CONCESSION\u00c1RIA",
-                        "CONCESSION\u00c1RIA-ANTT",
-                        "CONCESSION\u00c1RIA-ARTESP"
-                    ) ~
-                        "Concession\u00e1ria",
                     "NAO DISPONIVEL" ~ NA,
-                    "PREFEITURA" ~ "Prefeitura",
                     .default = .data$administracao
                 ),
-                jurisdicao_via = dplyr::case_match(
-                    .data$jurisdicao,
+                circunscricao = dplyr::case_match(
+                    .data$circunscricao,
                     "ESTADUAL" ~ "Estadual",
                     "MUNICIPAL" ~ "Municipal",
                     "FEDERAL" ~ "Federal",
                     "NAO DISPONIVEL" ~ NA
                 ),
-                tipo_sinistro_primario = dplyr::case_match(
-                    .data$tipo_acidente_primario,
+                tp_sinistro_primario = dplyr::case_match(
+                    .data$tp_sinistro_primario,
                     "ATROPELAMENTO" ~ "Atropelamento",
                     "COLISAO" ~ "Colis\u00e3o",
                     "CHOQUE" ~ "Choque",
+                    "OUTROS" ~ "Outros",
                     "NAO DISPONIVEL" ~ NA
                 ),
+                tipo_local = stringr::str_to_sentence(.data$tipo_local),
+                tipo_local = dplyr::if_else(
+                    .data$tipo_local == "Nao disponivel",
+                    NA,
+                    .data$tipo_local
+                ),
                 dplyr::across(
-                    dplyr::starts_with("tp_sinistro"),
+                    .data$tp_sinistro_atropelamento:.data$tp_sinistro_nao_disponivel,
                     ~ dplyr::case_when(
                         .x == "S" ~ 1,
                         is.na(.x) ~ 0
                     )
                 )
             ) |>
-            dplyr::left_join(
-                y = municipios,
-                by = c("municipio" = "s_ds_municipio")
-            ) |>
             dplyr::mutate(cod_ibge = as.character(.data$cod_ibge)) |>
             dplyr::left_join(list_ibge_sp, by = "cod_ibge") |>
             dplyr::select(
-                .data$id_sinistro,
-                .data$data_sinistro,
-                .data$hora_sinistro,
-                .data$cod_ibge,
-                .data$regiao_administrativa,
+                .data$id_sinistro:.data$hora_sinistro,
                 .data$nome_municipio,
-                .data$logradouro,
-                .data$numero_logradouro,
-                .data$tipo_via,
-                .data$longitude,
-                .data$latitude,
-                dplyr::starts_with("tp_veic"),
-                .data$tipo_registro,
-                dplyr::starts_with("gravidade"),
-                .data$administracao_via,
-                .data$conservacao,
-                .data$jurisdicao_via,
-                .data$tipo_sinistro_primario,
-                dplyr::starts_with("tp_sinistro")
+                .data$dia_da_semana:.data$cod_ibge,
+                .data$regiao_administrativa:.data$tp_sinistro_nao_disponivel
             )
     }
     if (file_type == "pessoas") {
