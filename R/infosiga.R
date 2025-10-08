@@ -1,139 +1,53 @@
-#' Download and Extract Infosiga data
+#' Load Infosiga Data from a ZIP File
 #'
-#' @description
-#' Downloads the complete Infosiga.SP database from the official website,
-#' handles potential HTTP errors with retries, and extracts the contents
-#' of the resulting ZIP file to a specified directory.
+#' Extracts and loads Infosiga data from a ZIP file containing CSV files.
+#' The function supports loading data on traffic incidents, people, or vehicles.
+#'
+#' @param file_type Character string specifying the type of file to load.
+#'   Must be one of:
+#'   \itemize{
+#'     \item `"sinistros"` — incident-level data
+#'     \item `"pessoas"` — person-level data
+#'     \item `"veiculos"` — vehicle-level data
+#'   }
+#' @param zip_path Path to the ZIP file containing the Infosiga dataset.
+#'
+#' @return A data frame containing the loaded Infosiga data.
 #'
 #' @details
-#' The function performs the download to a temporary file and then unzips it.
-#' It uses a robust `httr2` request that forces HTTP/1.1, sets a common
-#' User-Agent, and automatically retries the download up to 3 times in case of
-#' transient network errors. A progress bar is displayed during the download.
-#'
-#' @param destpath A string specifying the directory path where the data
-#'   files should be extracted. The path will be normalized, and if it's a
-#'   relative path, it will be resolved from the current working directory.
-#'
-#' @return
-#' This function does not return a value. It is called for its side effects:
-#' downloading a file and extracting it to the `destpath`.
-#'
-#' @export
-#' @import httr2
-#' @import cli
-#' @import fs
-#' @import utils
-#' @import glue
+#' The function extracts the ZIP file into a temporary directory, locates
+#' the corresponding CSV file based on the selected \code{file_type},
+#' and reads it using \pkg{readr}. Files are expected to be encoded
+#' in Latin-1. If the ZIP contains a subdirectory named
+#' \code{dados_infosiga}, the function automatically navigates into it.
 #'
 #' @examples
 #' \dontrun{
-#' # Create a temporary directory to store the data
-#' temp_dir <- tempdir()
-#'
-#' # Download and extract the data
-#' download_infosiga(destpath = temp_dir)
+#' df <- load_infosiga(
+#'     file_type = "sinistros",
+#'     zip_path = "path/to/infosiga_data.zip"
+#' )
 #' }
-download_infosiga <- function(destpath) {
-    zip_url <- "https://infosiga.detran.sp.gov.br/rest/painel/download/4"
-    tempzip <- tempfile()
-
-    # pb <- progress::progress_bar$new(
-    #     format = "Downloading [:bar] :percent in :elapsed | ETA: :eta | :rate",
-    #     total = NA,
-    #     witdh = 80,
-    #     clear = FALSE
-    # )
-
-    cli::cli_alert_info("Starting download...")
-
-    infosiga_req <- httr2::request(zip_url) |>
-        httr2::req_options(http_version = 2) |>
-        httr2::req_user_agent(
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36"
-        ) |>
-        httr2::req_retry(max_tries = 3) |>
-        httr2::req_progress() |>
-        httr2::req_error(is_error = \(resp) httr2::resp_status(resp) != 200)
-
-    tryCatch(
-        {
-            resp <- infosiga_req |>
-                httr2::req_perform(path = tempzip)
-            cli::cli_alert_success("Download completed.")
-        },
-        error = function(e) {
-            cli::cli_abort("Download failed.")
-            if (!is.null(e$parent)) {
-                print(e$parent$message)
-            } else {
-                print(e$message)
-            }
-        }
-    )
-
-    cli::cli_alert_info("Extrating zip...")
-    utils::unzip(tempzip, exdir = fs::path_abs(destpath))
-    cli::cli_alert_success(glue::glue(
-        "Data extracted successfully at '{fs::path_abs(destpath)}'"
-    ))
-
-    on.exit(unlink(tempzip))
-}
-
-#' Load Infosiga Data from Local Files
-#'
-#' @description
-#' Reads and combines one or more Infosiga data files (CSV) of a specific
-#' type from a given directory into a single data frame.
-#'
-#' @details
-#' This function searches for all files in the specified `path` that start with
-#' the `file_type` prefix (e.g., `sinistros_2023.csv`). It then uses
-#' `readr::read_csv2` to parse these semicolon-separated files. The function
-#' assumes 'latin1' encoding, which is necessary for handling special
-#' characters in the original data. All found files of the same type are
-#' stacked into a single tibble.
-#'
-#' @param file_type A string specifying the type of data to load. Must be one
-#'   of `'sinistros'` (the default), `'pessoas'`, or `'veiculos'`.
-#' @param path A string specifying the path to the directory containing the
-#'   Infosiga CSV files.
-#'
-#' @return A `tibble` (data frame) containing the combined data from all
-#'   matching CSV files.
 #'
 #' @export
-#' @importFrom readr read_csv2 locale
-#' @import rlang
-#'
-#' @examples
-#' \dontrun{
-#' # First, download the data
-#' data_dir <- tempdir()
-#' download_infosiga(destpath = data_dir)
-#'
-#' # Now, load the 'sinistros' data
-#' df_sinistros <- load_infosiga(file_type = "sinistros", path = data_dir)
-#'
-#' # Load the 'pessoas' data
-#' df_pessoas <- load_infosiga(file_type = "pessoas", path = data_dir)
-#' }
 load_infosiga <- function(
     file_type = c("sinistros", "pessoas", "veiculos"),
-    path
+    zip_path
 ) {
-    if (fs::dir_exists(glue::glue("{path}/dados_infosiga"))) {
-        path <- fs::path(path, "dados_infosiga")
+    tempdir <- tempdir()
+    utils::unzip(zipfile = zip_path, exdir = tempdir)
+    if (fs::dir_exists(glue::glue("{tempdir}/dados_infosiga"))) {
+        tempdir <- fs::path(tempdir, "dados_infosiga")
     }
 
     files <- list.files(
-        path,
+        tempdir,
         pattern = glue::glue("^{file_type}"),
         full.names = TRUE
     )
 
     df <- readr::read_csv2(files, locale = readr::locale(encoding = "latin1"))
+    on.exit(unlink(tempdir))
     return(df)
 }
 
@@ -171,6 +85,7 @@ load_infosiga <- function(
 #' @importFrom dplyr mutate case_match across starts_with if_else left_join select rename
 #' @importFrom lubridate dmy
 #' @importFrom stringr str_replace_all
+#' @importFrom rlang .data
 #'
 #' @examples
 #' \dontrun{
@@ -200,86 +115,62 @@ clean_infosiga <- function(
                     "NOTIFICACAO" ~ "Notifica\u00e7\u00e3o",
                 ),
                 data_sinistro = lubridate::dmy(.data$data_sinistro),
+                turno = stringr::str_to_sentence(.data$turno),
                 numero_logradouro = as.numeric(.data$numero_logradouro),
-                tipo_via = dplyr::case_match(
-                    .data$tipo_via,
-                    "NAO DISPONIVEL" ~ NA,
-                    c(
-                        "RODOVIAS",
-                        "RURAL",
-                        "RURAL (COM CARACTER\u00cdSTICA DE URBANA)"
-                    ) ~
-                        "Estradas e rodovias",
-                    c("URBANA", "VIAS MUNICIPAIS") ~ "Vias urbanas"
+                tipo_via = stringr::str_to_sentence(.data$tipo_via),
+                tipo_via = if_else(
+                    .data$tipo_via == "Nao disponivel",
+                    NA,
+                    .data$tipo_via
                 ),
                 dplyr::across(
-                    dplyr::starts_with("tp_veiculo"),
+                    .data$qtd_pedestre:.data$qtd_gravidade_nao_disponivel,
                     ~ dplyr::if_else(is.na(.x), 0, .x)
                 ),
-                dplyr::across(
-                    dplyr::starts_with("gravidade"),
-                    ~ dplyr::if_else(is.na(.x), 0, .x)
-                ),
-                administracao_via = dplyr::case_match(
+                administracao = dplyr::case_match(
                     .data$administracao,
-                    c(
-                        "CONCESSION\u00c1RIA",
-                        "CONCESSION\u00c1RIA-ANTT",
-                        "CONCESSION\u00c1RIA-ARTESP"
-                    ) ~
-                        "Concession\u00e1ria",
                     "NAO DISPONIVEL" ~ NA,
-                    "PREFEITURA" ~ "Prefeitura",
                     .default = .data$administracao
                 ),
-                jurisdicao_via = dplyr::case_match(
-                    .data$jurisdicao,
+                circunscricao = dplyr::case_match(
+                    .data$circunscricao,
                     "ESTADUAL" ~ "Estadual",
                     "MUNICIPAL" ~ "Municipal",
                     "FEDERAL" ~ "Federal",
                     "NAO DISPONIVEL" ~ NA
                 ),
-                tipo_sinistro_primario = dplyr::case_match(
-                    .data$tipo_acidente_primario,
+                tp_sinistro_primario = dplyr::case_match(
+                    .data$tp_sinistro_primario,
                     "ATROPELAMENTO" ~ "Atropelamento",
                     "COLISAO" ~ "Colis\u00e3o",
                     "CHOQUE" ~ "Choque",
+                    "OUTROS" ~ "Outros",
                     "NAO DISPONIVEL" ~ NA
                 ),
+                tipo_local = stringr::str_to_sentence(.data$tipo_local),
+                tipo_local = dplyr::if_else(
+                    .data$tipo_local == "Nao disponivel",
+                    NA,
+                    .data$tipo_local
+                ),
+                regiao_administrativa = stringr::str_to_sentence(
+                    .data$regiao_administrativa
+                ),
                 dplyr::across(
-                    dplyr::starts_with("tp_sinistro"),
+                    .data$tp_sinistro_atropelamento:.data$tp_sinistro_nao_disponivel,
                     ~ dplyr::case_when(
                         .x == "S" ~ 1,
                         is.na(.x) ~ 0
                     )
                 )
             ) |>
-            dplyr::left_join(
-                y = municipios,
-                by = c("municipio" = "s_ds_municipio")
-            ) |>
             dplyr::mutate(cod_ibge = as.character(.data$cod_ibge)) |>
             dplyr::left_join(list_ibge_sp, by = "cod_ibge") |>
             dplyr::select(
-                .data$id_sinistro,
-                .data$data_sinistro,
-                .data$hora_sinistro,
-                .data$cod_ibge,
-                .data$regiao_administrativa,
+                .data$id_sinistro:.data$hora_sinistro,
                 .data$nome_municipio,
-                .data$logradouro,
-                .data$numero_logradouro,
-                .data$tipo_via,
-                .data$longitude,
-                .data$latitude,
-                dplyr::starts_with("tp_veic"),
-                .data$tipo_registro,
-                dplyr::starts_with("gravidade"),
-                .data$administracao_via,
-                .data$conservacao,
-                .data$jurisdicao_via,
-                .data$tipo_sinistro_primario,
-                dplyr::starts_with("tp_sinistro")
+                .data$dia_da_semana:.data$cod_ibge,
+                .data$regiao_administrativa:.data$tp_sinistro_nao_disponivel
             )
     }
     if (file_type == "pessoas") {
@@ -293,7 +184,7 @@ clean_infosiga <- function(
                 ),
                 data_obito = lubridate::dmy(.data$data_obito),
                 tipo_de_vitima = dplyr::case_match(
-                    .data[["tipo_de v\u00edtima"]],
+                    .data$tipo_de_vitima,
                     "CONDUTOR" ~ "Condutor",
                     "PASSAGEIRO" ~ "Passageiro",
                     "PEDESTRE" ~ "Pedestre",
@@ -301,7 +192,6 @@ clean_infosiga <- function(
                 ),
                 tipo_veiculo_vitima = dplyr::case_match(
                     .data$tipo_veiculo_vitima,
-                    c("PEDESTRE", "Pedestre") ~ "A p\u00e9",
                     "MOTOCICLETA" ~ "Motocicleta",
                     "AUTOMOVEL" ~ "Autom\u00f3vel",
                     "NAO DISPONIVEL" ~ NA,
@@ -311,17 +201,17 @@ clean_infosiga <- function(
                     "ONIBUS" ~ "\u00d4nibus",
                     .default = .data$tipo_veiculo_vitima
                 ),
-                tipo_modo_vitima = dplyr::case_match(
-                    .data$tipo_veiculo_vitima,
-                    "A p\u00e9" ~ "Pedestre",
-                    "Motocicleta" ~ "Ocupante de motocicleta",
-                    "Autom\u00f3vel" ~ "Ocupante de autom\u00f3vel",
-                    "Bicicleta" ~ "Ciclista",
-                    "Caminh\u00e3o" ~ "Ocupante de caminh\u00e3o",
-                    "\u00d4nibus" ~ "Ocupante de \u00f4nibus",
-                    'Outros' ~ "Outros",
-                    .default = NA
-                ),
+                # tipo_modo_vitima = dplyr::case_match(
+                #     .data$tipo_veiculo_vitima,
+                #     "A p\u00e9" ~ "Pedestre",
+                #     "Motocicleta" ~ "Ocupante de motocicleta",
+                #     "Autom\u00f3vel" ~ "Ocupante de autom\u00f3vel",
+                #     "Bicicleta" ~ "Ciclista",
+                #     "Caminh\u00e3o" ~ "Ocupante de caminh\u00e3o",
+                #     "\u00d4nibus" ~ "Ocupante de \u00f4nibus",
+                #     'Outros' ~ "Outros",
+                #     .default = NA
+                # ),
                 gravidade_lesao = dplyr::case_match(
                     .data$gravidade_lesao,
                     "FATAL" ~ "Fatal",
@@ -384,23 +274,21 @@ clean_infosiga <- function(
                         "80+"
                     )
                 ),
-                data_sinistro = lubridate::dmy(.data$data_sinistro)
-            ) |>
-            dplyr::rename(
-                tipo_vitima = .data$`tipo_de_vitima`
+                data_sinistro = lubridate::dmy(.data$data_sinistro),
+                local_obito = dplyr::case_match(
+                    .data$local_obito,
+                    "PUBLICO" ~ "Publico",
+                    "NAO DISPONIVEL" ~ NA,
+                    "PRIVADO" ~ "Privado"
+                )
             ) |>
             dplyr::select(
                 .data$id_sinistro,
-                .data$data_sinistro,
-                .data$data_obito,
-                .data$sexo,
-                .data$idade,
-                .data$tipo_vitima,
-                .data$faixa_etaria_demografica,
-                .data$faixa_etaria_legal,
-                .data$tipo_veiculo_vitima,
-                .data$tipo_modo_vitima,
-                .data$gravidade_lesao
+                .data$id_veiculo,
+                .data$tipo_veiculo_vitima:.data$nacionalidade,
+                .data$data_obito:.data$dia_obito,
+                .data$local_obito,
+                .data$tempo_sinistro_obito
             )
     }
 
@@ -408,7 +296,9 @@ clean_infosiga <- function(
         df <- df_infosiga |>
             dplyr::select(
                 .data$id_sinistro,
-                ano_fabricacao = .data$ano_fab,
+                .data$id_veiculo,
+                .data$marca_modelo,
+                .data$ano_fab,
                 .data$ano_modelo,
                 .data$cor_veiculo,
                 .data$tipo_veiculo
@@ -423,7 +313,14 @@ clean_infosiga <- function(
                     "OUTROS" ~ "Outros",
                     "BICICLETA" ~ "Bicicleta",
                     "NAO DISPONIVEL" ~ NA
-                )
+                ),
+                cor_veiculo = dplyr::if_else(
+                    .data$cor_veiculo %in%
+                        c("N\u00e3o Informado", "SEM IDENTIFICACAO"),
+                    NA,
+                    .data$cor_veiculo
+                ),
+                cor_veiculo = stringr::str_to_sentence(.data$cor_veiculo)
             )
     }
     return(df)

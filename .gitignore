@@ -6,3 +6,4 @@
 .quarto
 inst/doc
 docs
+data-raw/dados_infosiga.zip
