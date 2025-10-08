@@ -1,6 +1,6 @@
 Package: ost.utils
 Title: Provides Utility Methods and Tools for COST
-Version: 0.1.3
+Version: 0.2.0
 Authors@R: 
     person(
         given = c("Pedro", "Augusto", "Borges"),
