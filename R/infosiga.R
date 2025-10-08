@@ -1,139 +1,53 @@
-#' Download and Extract Infosiga data
+#' Load Infosiga Data from a ZIP File
 #'
-#' @description
-#' Downloads the complete Infosiga.SP database from the official website,
-#' handles potential HTTP errors with retries, and extracts the contents
-#' of the resulting ZIP file to a specified directory.
+#' Extracts and loads Infosiga data from a ZIP file containing CSV files.
+#' The function supports loading data on traffic incidents, people, or vehicles.
+#'
+#' @param file_type Character string specifying the type of file to load.
+#'   Must be one of:
+#'   \itemize{
+#'     \item `"sinistros"` — incident-level data
+#'     \item `"pessoas"` — person-level data
+#'     \item `"veiculos"` — vehicle-level data
+#'   }
+#' @param zip_path Path to the ZIP file containing the Infosiga dataset.
+#'
+#' @return A data frame containing the loaded Infosiga data.
 #'
 #' @details
-#' The function performs the download to a temporary file and then unzips it.
-#' It uses a robust `httr2` request that forces HTTP/1.1, sets a common
-#' User-Agent, and automatically retries the download up to 3 times in case of
-#' transient network errors. A progress bar is displayed during the download.
-#'
-#' @param destpath A string specifying the directory path where the data
-#'   files should be extracted. The path will be normalized, and if it's a
-#'   relative path, it will be resolved from the current working directory.
-#'
-#' @return
-#' This function does not return a value. It is called for its side effects:
-#' downloading a file and extracting it to the `destpath`.
-#'
-#' @export
-#' @import httr2
-#' @import cli
-#' @import fs
-#' @import utils
-#' @import glue
+#' The function extracts the ZIP file into a temporary directory, locates
+#' the corresponding CSV file based on the selected \code{file_type},
+#' and reads it using \pkg{readr}. Files are expected to be encoded
+#' in Latin-1. If the ZIP contains a subdirectory named
+#' \code{dados_infosiga}, the function automatically navigates into it.
 #'
 #' @examples
 #' \dontrun{
-#' # Create a temporary directory to store the data
-#' temp_dir <- tempdir()
-#'
-#' # Download and extract the data
-#' download_infosiga(destpath = temp_dir)
+#' df <- load_infosiga(
+#'     file_type = "sinistros",
+#'     zip_path = "path/to/infosiga_data.zip"
+#' )
 #' }
-download_infosiga <- function(destpath) {
-    zip_url <- "https://infosiga.detran.sp.gov.br/rest/painel/download/4"
-    tempzip <- tempfile()
-
-    # pb <- progress::progress_bar$new(
-    #     format = "Downloading [:bar] :percent in :elapsed | ETA: :eta | :rate",
-    #     total = NA,
-    #     witdh = 80,
-    #     clear = FALSE
-    # )
-
-    cli::cli_alert_info("Starting download...")
-
-    infosiga_req <- httr2::request(zip_url) |>
-        httr2::req_options(http_version = 2) |>
-        httr2::req_user_agent(
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36"
-        ) |>
-        httr2::req_retry(max_tries = 3) |>
-        httr2::req_progress() |>
-        httr2::req_error(is_error = \(resp) httr2::resp_status(resp) != 200)
-
-    tryCatch(
-        {
-            resp <- infosiga_req |>
-                httr2::req_perform(path = tempzip)
-            cli::cli_alert_success("Download completed.")
-        },
-        error = function(e) {
-            cli::cli_abort("Download failed.")
-            if (!is.null(e$parent)) {
-                print(e$parent$message)
-            } else {
-                print(e$message)
-            }
-        }
-    )
-
-    cli::cli_alert_info("Extrating zip...")
-    utils::unzip(tempzip, exdir = fs::path_abs(destpath))
-    cli::cli_alert_success(glue::glue(
-        "Data extracted successfully at '{fs::path_abs(destpath)}'"
-    ))
-
-    on.exit(unlink(tempzip))
-}
-
-#' Load Infosiga Data from Local Files
-#'
-#' @description
-#' Reads and combines one or more Infosiga data files (CSV) of a specific
-#' type from a given directory into a single data frame.
-#'
-#' @details
-#' This function searches for all files in the specified `path` that start with
-#' the `file_type` prefix (e.g., `sinistros_2023.csv`). It then uses
-#' `readr::read_csv2` to parse these semicolon-separated files. The function
-#' assumes 'latin1' encoding, which is necessary for handling special
-#' characters in the original data. All found files of the same type are
-#' stacked into a single tibble.
-#'
-#' @param file_type A string specifying the type of data to load. Must be one
-#'   of `'sinistros'` (the default), `'pessoas'`, or `'veiculos'`.
-#' @param path A string specifying the path to the directory containing the
-#'   Infosiga CSV files.
-#'
-#' @return A `tibble` (data frame) containing the combined data from all
-#'   matching CSV files.
 #'
 #' @export
-#' @importFrom readr read_csv2 locale
-#' @import rlang
-#'
-#' @examples
-#' \dontrun{
-#' # First, download the data
-#' data_dir <- tempdir()
-#' download_infosiga(destpath = data_dir)
-#'
-#' # Now, load the 'sinistros' data
-#' df_sinistros <- load_infosiga(file_type = "sinistros", path = data_dir)
-#'
-#' # Load the 'pessoas' data
-#' df_pessoas <- load_infosiga(file_type = "pessoas", path = data_dir)
-#' }
 load_infosiga <- function(
     file_type = c("sinistros", "pessoas", "veiculos"),
-    path
+    zip_path
 ) {
-    if (fs::dir_exists(glue::glue("{path}/dados_infosiga"))) {
-        path <- fs::path(path, "dados_infosiga")
+    tempdir <- tempdir()
+    utils::unzip(zipfile = zip_path, exdir = tempdir)
+    if (fs::dir_exists(glue::glue("{tempdir}/dados_infosiga"))) {
+        tempdir <- fs::path(tempdir, "dados_infosiga")
     }
 
     files <- list.files(
-        path,
+        tempdir,
         pattern = glue::glue("^{file_type}"),
         full.names = TRUE
     )
 
     df <- readr::read_csv2(files, locale = readr::locale(encoding = "latin1"))
+    on.exit(unlink(tempdir))
     return(df)
 }
 
@@ -171,6 +85,7 @@ load_infosiga <- function(
 #' @importFrom dplyr mutate case_match across starts_with if_else left_join select rename
 #' @importFrom lubridate dmy
 #' @importFrom stringr str_replace_all
+#' @importFrom rlang .data
 #'
 #' @examples
 #' \dontrun{
@@ -362,7 +277,7 @@ clean_infosiga <- function(
                 data_sinistro = lubridate::dmy(.data$data_sinistro),
                 local_obito = dplyr::case_match(
                     .data$local_obito,
-                    "PUBLICO" ~ "Público",
+                    "PUBLICO" ~ "Publico",
                     "NAO DISPONIVEL" ~ NA,
                     "PRIVADO" ~ "Privado"
                 )
@@ -401,7 +316,7 @@ clean_infosiga <- function(
                 ),
                 cor_veiculo = dplyr::if_else(
                     .data$cor_veiculo %in%
-                        c("Não Informado", "SEM IDENTIFICACAO"),
+                        c("N\u00e3o Informado", "SEM IDENTIFICACAO"),
                     NA,
                     .data$cor_veiculo
                 ),

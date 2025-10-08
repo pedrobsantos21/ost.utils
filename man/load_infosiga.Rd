@@ -2,43 +2,41 @@
 % Please edit documentation in R/infosiga.R
 \name{load_infosiga}
 \alias{load_infosiga}
-\title{Load Infosiga Data from Local Files}
+\title{Load Infosiga Data from a ZIP File}
 \usage{
-load_infosiga(file_type = c("sinistros", "pessoas", "veiculos"), path)
+load_infosiga(file_type = c("sinistros", "pessoas", "veiculos"), zip_path)
 }
 \arguments{
-\item{file_type}{A string specifying the type of data to load. Must be one
-of \code{'sinistros'} (the default), \code{'pessoas'}, or \code{'veiculos'}.}
+\item{file_type}{Character string specifying the type of file to load.
+Must be one of:
+\itemize{
+\item \code{"sinistros"} — incident-level data
+\item \code{"pessoas"} — person-level data
+\item \code{"veiculos"} — vehicle-level data
+}}
 
-\item{path}{A string specifying the path to the directory containing the
-Infosiga CSV files.}
+\item{zip_path}{Path to the ZIP file containing the Infosiga dataset.}
 }
 \value{
-A \code{tibble} (data frame) containing the combined data from all
-matching CSV files.
+A data frame containing the loaded Infosiga data.
 }
 \description{
-Reads and combines one or more Infosiga data files (CSV) of a specific
-type from a given directory into a single data frame.
+Extracts and loads Infosiga data from a ZIP file containing CSV files.
+The function supports loading data on traffic incidents, people, or vehicles.
 }
 \details{
-This function searches for all files in the specified \code{path} that start with
-the \code{file_type} prefix (e.g., \code{sinistros_2023.csv}). It then uses
-\code{readr::read_csv2} to parse these semicolon-separated files. The function
-assumes 'latin1' encoding, which is necessary for handling special
-characters in the original data. All found files of the same type are
-stacked into a single tibble.
+The function extracts the ZIP file into a temporary directory, locates
+the corresponding CSV file based on the selected \code{file_type},
+and reads it using \pkg{readr}. Files are expected to be encoded
+in Latin-1. If the ZIP contains a subdirectory named
+\code{dados_infosiga}, the function automatically navigates into it.
 }
 \examples{
 \dontrun{
-# First, download the data
-data_dir <- tempdir()
-download_infosiga(destpath = data_dir)
-
-# Now, load the 'sinistros' data
-df_sinistros <- load_infosiga(file_type = "sinistros", path = data_dir)
-
-# Load the 'pessoas' data
-df_pessoas <- load_infosiga(file_type = "pessoas", path = data_dir)
+df <- load_infosiga(
+    file_type = "sinistros",
+    zip_path = "path/to/infosiga_data.zip"
+)
 }
+
 }

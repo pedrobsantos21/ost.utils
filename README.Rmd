@@ -37,9 +37,12 @@ This is a basic example which shows you how to download and clean Infosiga.SP da
 ```{r}
 library(ost.utils)
 
-temp <- tempdir()
-download_infosiga(temp)
-df_sinistros <- load_infosiga(file_type = "sinistros", path = temp)
+
+df_sinistros <- load_infosiga(
+  file_type = "sinistros", 
+  zip_path = "data-raw/dados_infosiga.zip"
+)
+
 df_sinistros_clean <- clean_infosiga(df_sinistros, "sinistros")
 
 head(df_sinistros_clean)
