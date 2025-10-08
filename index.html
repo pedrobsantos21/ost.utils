@@ -22,7 +22,7 @@
 
     <a class="navbar-brand me-2" href="index.html">ost.utils</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -32,12 +32,6 @@
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
 <li class="nav-item"><a class="nav-link" href="reference/index.html">Reference</a></li>
-<li class="nav-item dropdown">
-  <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="articles/ostutils.html">Getting Started</a></li>
-  </ul>
-</li>
 <li class="nav-item"><a class="nav-link" href="news/index.html">Changelog</a></li>
       </ul>
 <ul class="navbar-nav">
@@ -73,43 +67,42 @@
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/pedrobsantos21/ost.utils" class="external-link">ost.utils</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">temp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="fu"><a href="reference/download_infosiga.html">download_infosiga</a></span><span class="op">(</span><span class="va">temp</span><span class="op">)</span></span>
-<span><span class="co">#&gt; ℹ Starting download...</span></span>
-<span><span class="co">#&gt; ✔ Download completed.</span></span>
-<span><span class="co">#&gt; ℹ Extrating zip...</span></span>
-<span><span class="co">#&gt; ✔ Data extracted successfully at '/tmp/RtmpqOX4rj'</span></span>
-<span><span class="va">df_sinistros</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/load_infosiga.html">load_infosiga</a></span><span class="op">(</span>file_type <span class="op">=</span> <span class="st">"sinistros"</span>, path <span class="op">=</span> <span class="va">temp</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">df_sinistros</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/load_infosiga.html">load_infosiga</a></span><span class="op">(</span></span>
+<span>  file_type <span class="op">=</span> <span class="st">"sinistros"</span>, </span>
+<span>  zip_path <span class="op">=</span> <span class="st">"data-raw/dados_infosiga.zip"</span></span>
+<span><span class="op">)</span></span>
 <span><span class="co">#&gt; ℹ Using "','" as decimal and "'.'" as grouping mark. Use `read_delim()` for more control.</span></span>
-<span><span class="co">#&gt; Rows: 1208097 Columns: 43</span></span>
+<span><span class="co">#&gt; Rows: 1257986 Columns: 48</span></span>
 <span><span class="co">#&gt; ── Column specification ────────────────────────────────────────────────────────</span></span>
 <span><span class="co">#&gt; Delimiter: ";"</span></span>
-<span><span class="co">#&gt; chr  (26): tipo_registro, data_sinistro, mes_sinistro, dia_sinistro, ano_mes...</span></span>
-<span><span class="co">#&gt; dbl  (15): id_sinistro, ano_sinistro, latitude, longitude, tp_veiculo_bicicl...</span></span>
-<span><span class="co">#&gt; lgl   (1): gravidade_ileso</span></span>
+<span><span class="co">#&gt; chr  (28): tipo_registro, data_sinistro, mes_sinistro, dia_sinistro, ano_mes...</span></span>
+<span><span class="co">#&gt; dbl  (17): id_sinistro, ano_sinistro, latitude, longitude, cod_ibge, qtd_ped...</span></span>
+<span><span class="co">#&gt; lgl   (2): qtd_gravidade_ileso, tp_sinistro_colisao_traseira</span></span>
 <span><span class="co">#&gt; time  (1): hora_sinistro</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; ℹ Use `spec()` to retrieve the full column specification for this data.</span></span>
 <span><span class="co">#&gt; ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</span></span>
+<span></span>
 <span><span class="va">df_sinistros_clean</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/clean_infosiga.html">clean_infosiga</a></span><span class="op">(</span><span class="va">df_sinistros</span>, <span class="st">"sinistros"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">df_sinistros_clean</span><span class="op">)</span></span>
-<span><span class="co">#&gt; # A tibble: 6 × 40</span></span>
-<span><span class="co">#&gt;   id_sinistro data_sinistro hora_sinistro cod_ibge regiao_administrativa     </span></span>
-<span><span class="co">#&gt;         &lt;dbl&gt; &lt;date&gt;        &lt;time&gt;        &lt;chr&gt;    &lt;chr&gt;                     </span></span>
-<span><span class="co">#&gt; 1     2501575 2014-12-21    20:00         3509502  Campinas                  </span></span>
-<span><span class="co">#&gt; 2     2456933 2014-12-23       NA         3505500  Barretos                  </span></span>
-<span><span class="co">#&gt; 3     2463759 2014-12-26    06:52         3550308  Metropolitana de São Paulo</span></span>
-<span><span class="co">#&gt; 4     2487781 2014-12-28    14:30         3510609  Metropolitana de São Paulo</span></span>
-<span><span class="co">#&gt; 5     2489730 2014-12-28       NA         3541000  Baixada Santista          </span></span>
-<span><span class="co">#&gt; 6     2462674 2014-12-31    22:53         3550308  Metropolitana de São Paulo</span></span>
-<span><span class="co">#&gt; # ℹ 35 more variables: nome_municipio &lt;chr&gt;, logradouro &lt;chr&gt;,</span></span>
-<span><span class="co">#&gt; #   numero_logradouro &lt;dbl&gt;, tipo_via &lt;chr&gt;, longitude &lt;dbl&gt;, latitude &lt;dbl&gt;,</span></span>
-<span><span class="co">#&gt; #   tp_veiculo_bicicleta &lt;dbl&gt;, tp_veiculo_caminhao &lt;dbl&gt;,</span></span>
-<span><span class="co">#&gt; #   tp_veiculo_motocicleta &lt;dbl&gt;, tp_veiculo_nao_disponivel &lt;dbl&gt;,</span></span>
-<span><span class="co">#&gt; #   tp_veiculo_onibus &lt;dbl&gt;, tp_veiculo_outros &lt;dbl&gt;,</span></span>
-<span><span class="co">#&gt; #   tp_veiculo_automovel &lt;dbl&gt;, tipo_registro &lt;chr&gt;,</span></span>
-<span><span class="co">#&gt; #   gravidade_nao_disponivel &lt;dbl&gt;, gravidade_leve &lt;dbl&gt;, …</span></span></code></pre></div>
+<span><span class="co">#&gt; # A tibble: 6 × 47</span></span>
+<span><span class="co">#&gt;   id_sinistro tipo_registro data_sinistro ano_sinistro mes_sinistro dia_sinistro</span></span>
+<span><span class="co">#&gt;         &lt;dbl&gt; &lt;chr&gt;         &lt;date&gt;               &lt;dbl&gt; &lt;chr&gt;        &lt;chr&gt;       </span></span>
+<span><span class="co">#&gt; 1     2501575 Sinistro fat… 2014-12-21            2014 12           21          </span></span>
+<span><span class="co">#&gt; 2     2456933 Sinistro fat… 2014-12-23            2014 12           23          </span></span>
+<span><span class="co">#&gt; 3     2463759 Sinistro fat… 2014-12-26            2014 12           26          </span></span>
+<span><span class="co">#&gt; 4     2487781 Sinistro fat… 2014-12-28            2014 12           28          </span></span>
+<span><span class="co">#&gt; 5     2489730 Sinistro fat… 2014-12-28            2014 12           28          </span></span>
+<span><span class="co">#&gt; 6     2462674 Sinistro fat… 2014-12-31            2014 12           31          </span></span>
+<span><span class="co">#&gt; # ℹ 41 more variables: hora_sinistro &lt;time&gt;, nome_municipio &lt;chr&gt;,</span></span>
+<span><span class="co">#&gt; #   dia_da_semana &lt;chr&gt;, turno &lt;chr&gt;, logradouro &lt;chr&gt;,</span></span>
+<span><span class="co">#&gt; #   numero_logradouro &lt;dbl&gt;, tipo_via &lt;chr&gt;, tipo_local &lt;chr&gt;, latitude &lt;dbl&gt;,</span></span>
+<span><span class="co">#&gt; #   longitude &lt;dbl&gt;, cod_ibge &lt;chr&gt;, regiao_administrativa &lt;chr&gt;,</span></span>
+<span><span class="co">#&gt; #   administracao &lt;chr&gt;, conservacao &lt;chr&gt;, circunscricao &lt;chr&gt;,</span></span>
+<span><span class="co">#&gt; #   tp_sinistro_primario &lt;chr&gt;, qtd_pedestre &lt;dbl&gt;, qtd_bicicleta &lt;dbl&gt;,</span></span>
+<span><span class="co">#&gt; #   qtd_motocicleta &lt;dbl&gt;, qtd_automovel &lt;dbl&gt;, qtd_onibus &lt;dbl&gt;, …</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="license">License<a class="anchor" aria-label="anchor" href="#license"></a>
@@ -124,7 +117,8 @@
 <span><span class="co">#&gt; To cite package 'ost.utils' in publications use:</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;   Santos PAB (2025). _ost.utils: Provides Utility Methods and Tools for</span></span>
-<span><span class="co">#&gt;   COST_. R package version 0.0.0.9000,</span></span>
+<span><span class="co">#&gt;   COST_. R package version 0.1.3,</span></span>
+<span><span class="co">#&gt;   https://pedrobsantos21.github.io/ost.utils/,</span></span>
 <span><span class="co">#&gt;   &lt;https://github.com/pedrobsantos21/ost.utils&gt;.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; A BibTeX entry for LaTeX users is</span></span>
@@ -133,7 +127,7 @@
 <span><span class="co">#&gt;     title = {ost.utils: Provides Utility Methods and Tools for COST},</span></span>
 <span><span class="co">#&gt;     author = {Pedro Augusto Borges Santos},</span></span>
 <span><span class="co">#&gt;     year = {2025},</span></span>
-<span><span class="co">#&gt;     note = {R package version 0.0.0.9000},</span></span>
+<span><span class="co">#&gt;     note = {R package version 0.1.3, https://pedrobsantos21.github.io/ost.utils/},</span></span>
 <span><span class="co">#&gt;     url = {https://github.com/pedrobsantos21/ost.utils},</span></span>
 <span><span class="co">#&gt;   }</span></span></code></pre></div>
 </div>

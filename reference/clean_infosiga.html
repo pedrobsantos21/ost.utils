@@ -11,7 +11,7 @@ pessoas, or veiculos)."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">ost.utils</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -20,10 +20,6 @@ pessoas, or veiculos)."></head><body>
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto"><li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
-<li class="nav-item dropdown">
-  <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/ostutils.html">Getting Started</a></li>
-  </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
@@ -37,7 +33,7 @@ pessoas, or veiculos)."></head><body>
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Clean and Standardize Raw Infosiga Data</h1>
-      <small class="dont-index">Source: <a href="https://github.com/pedrobsantos21/ost.utils/blob/v0.1.3/R/infosiga.R" class="external-link"><code>R/infosiga.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/pedrobsantos21/ost.utils/blob/main/R/infosiga.R" class="external-link"><code>R/infosiga.R</code></a></small>
       <div class="d-none name"><code>clean_infosiga.Rd</code></div>
     </div>
 
@@ -91,7 +87,7 @@ variables, dropping intermediate or raw ones.</p></li>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
 <span class="r-in"><span><span class="co"># First, download and load the data</span></span></span>
 <span class="r-in"><span><span class="va">data_dir</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="download_infosiga.html">download_infosiga</a></span><span class="op">(</span>destpath <span class="op">=</span> <span class="va">data_dir</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">download_infosiga</span><span class="op">(</span>destpath <span class="op">=</span> <span class="va">data_dir</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">raw_sinistros_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="load_infosiga.html">load_infosiga</a></span><span class="op">(</span>file_type <span class="op">=</span> <span class="st">"sinistros"</span>, path <span class="op">=</span> <span class="va">data_dir</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Clean the 'sinistros' data</span></span></span>
